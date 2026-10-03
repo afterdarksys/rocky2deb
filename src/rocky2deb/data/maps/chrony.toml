@@ -1,0 +1,27 @@
+id = "chrony"
+rocky = "/etc/chrony.conf"
+debian = "/etc/chrony/chrony.conf"
+format = "chrony"
+critical = true
+mode = "rewrite"
+packages = ["chrony"]
+known = [
+  "server",
+  "pool",
+  "peer",
+  "driftfile",
+  "makestep",
+  "rtcsync",
+  "logdir",
+  "sourcedir",
+  "leapsectz",
+  "hwtimestamp",
+  "bindaddress",
+  "allow",
+  "deny",
+  "local",
+  "maxupdateskew",
+  "keyfile",
+  "dumponexit",
+  "log",
+]

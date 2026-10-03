@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rocky2deb"
+version = "0.1.0"
+description = "Plan Rocky Linux to Debian migrations, convert source packages, and bring one RPM onto Debian with rockify."
+readme = "docs/plans/2026-10-03-rocky2deb-design.md"
+requires-python = ">=3.11"
+
+[project.scripts]
+rocky2deb = "rocky2deb.cli:main"
+rockify = "rocky2deb.rockify_cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+rocky2deb = ["data/*.toml", "data/maps/*.toml"]

@@ -1,0 +1,8 @@
+id = "hostname"
+rocky = "/etc/hostname"
+debian = "/etc/hostname"
+format = "text"
+critical = true
+mode = "copy"
+packages = ["systemd"]
+known = []

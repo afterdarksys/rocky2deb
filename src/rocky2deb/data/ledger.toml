@@ -1,0 +1,20 @@
+[redis]
+class = "non-free"
+allow_rebuild = true
+note = "Debian ships valkey. A Rocky redis rebuild is non-free and is built only when allow_rebuild is set."
+
+[rocky-logos]
+class = "trademark"
+allow_rebuild = false
+
+[redhat-logos]
+class = "trademark"
+allow_rebuild = false
+
+[centos-logos]
+class = "trademark"
+allow_rebuild = false
+
+[rocky-backgrounds]
+class = "trademark"
+allow_rebuild = false

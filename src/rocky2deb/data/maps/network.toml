@@ -1,0 +1,8 @@
+id = "network"
+rocky = "/etc/NetworkManager/system-connections"
+debian = "/etc/NetworkManager/system-connections"
+format = "keyfile"
+critical = true
+mode = "copy"
+packages = ["NetworkManager"]
+known = []

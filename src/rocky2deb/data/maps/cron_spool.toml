@@ -1,0 +1,8 @@
+id = "cron_spool"
+rocky = "/var/spool/cron"
+debian = "/var/spool/cron/crontabs"
+format = "cron-spool"
+critical = true
+mode = "rewrite"
+packages = ["cronie"]
+known = []

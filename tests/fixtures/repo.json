@@ -1,0 +1,32 @@
+{
+  "packages": [
+    {
+      "name": "widget",
+      "arch": "x86_64",
+      "version": "1.2.0",
+      "release": "1",
+      "license": "MIT",
+      "sourcerpm": "widget-1.2.0-1.src.rpm",
+      "requires": ["libwidget", "glibc", "rpmlib(CompressedFileNames)", "/usr/bin/sh"],
+      "build_requires": ["gcc"]
+    },
+    {
+      "name": "libwidget",
+      "arch": "x86_64",
+      "version": "1.2.0",
+      "release": "1",
+      "license": "MIT",
+      "sourcerpm": "libwidget-1.2.0-1.src.rpm",
+      "requires": ["glibc"]
+    },
+    {
+      "name": "gcc",
+      "arch": "x86_64",
+      "version": "11",
+      "release": "1",
+      "license": "GPL-3.0-or-later",
+      "sourcerpm": "gcc-11-1.src.rpm",
+      "requires": ["glibc"]
+    }
+  ]
+}

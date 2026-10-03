@@ -1,0 +1,34 @@
+[httpd]
+deb = "apache2"
+unit = "httpd.service"
+deb_unit = "apache2.service"
+
+[cronie]
+deb = "cron"
+
+[NetworkManager]
+deb = "network-manager"
+
+[firewalld]
+deb = "firewalld"
+
+[chrony]
+deb = "chrony"
+
+[openssh-server]
+deb = "openssh-server"
+
+[sudo]
+deb = "sudo"
+
+[rsyslog]
+deb = "rsyslog"
+
+[mariadb-server]
+deb = "mariadb-server"
+
+[postgresql-server]
+deb = "postgresql"
+
+[nginx]
+deb = "nginx"

@@ -1,0 +1,8 @@
+id = "journald"
+rocky = "/etc/systemd/journald.conf"
+debian = "/etc/systemd/journald.conf"
+format = "copy"
+critical = true
+mode = "copy"
+packages = ["systemd"]
+known = []

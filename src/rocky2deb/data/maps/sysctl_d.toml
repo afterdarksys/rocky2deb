@@ -1,0 +1,8 @@
+id = "sysctl_d"
+rocky = "/etc/sysctl.d"
+debian = "/etc/sysctl.d"
+format = "sysctl"
+critical = true
+mode = "rewrite"
+packages = ["procps-ng"]
+known = []

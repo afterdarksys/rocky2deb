@@ -1,0 +1,8 @@
+id = "cron_d"
+rocky = "/etc/cron.d"
+debian = "/etc/cron.d"
+format = "copy"
+critical = false
+mode = "copy"
+packages = ["cronie"]
+known = []

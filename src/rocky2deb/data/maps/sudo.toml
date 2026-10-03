@@ -1,0 +1,8 @@
+id = "sudo"
+rocky = "/etc/sudoers"
+debian = "/etc/sudoers"
+format = "copy"
+critical = true
+mode = "copy"
+packages = ["sudo"]
+known = []

@@ -1,0 +1,36 @@
+id = "sshd"
+rocky = "/etc/ssh/sshd_config"
+debian = "/etc/ssh/sshd_config"
+format = "sshd"
+critical = true
+mode = "rewrite"
+packages = ["openssh-server"]
+known = [
+  "Port",
+  "AddressFamily",
+  "ListenAddress",
+  "PermitRootLogin",
+  "PasswordAuthentication",
+  "PubkeyAuthentication",
+  "KbdInteractiveAuthentication",
+  "UsePAM",
+  "X11Forwarding",
+  "PrintMotd",
+  "AcceptEnv",
+  "Subsystem",
+  "Include",
+  "AllowUsers",
+  "AllowGroups",
+  "DenyUsers",
+  "DenyGroups",
+  "MaxAuthTries",
+  "ClientAliveInterval",
+  "ClientAliveCountMax",
+  "PermitEmptyPasswords",
+  "AuthorizedKeysFile",
+  "Banner",
+  "LogLevel",
+  "SyslogFacility",
+  "HostKey",
+  "Match",
+]
