@@ -135,6 +135,58 @@ def remap_text(text: str, cmap: ConfigMap) -> RemapResult:
     return RemapResult(cmap.id, cmap.debian, body, aside_body, unmapped, cmap.critical)
 
 
+def translate_config_path_reverse(path: str, cmap: ConfigMap) -> str:
+    """Map a Debian path onto the Rocky path. A second pass stays put."""
+    if path == cmap.debian or path == cmap.rocky:
+        return cmap.rocky
+    rocky_prefix = cmap.rocky.rstrip("/") + "/"
+    debian_prefix = cmap.debian.rstrip("/") + "/"
+    if path.startswith(rocky_prefix):
+        return path
+    if path.startswith(debian_prefix):
+        return rocky_prefix + path[len(debian_prefix) :]
+    return path
+
+
+def remap_text_reverse(text: str, cmap: ConfigMap) -> RemapResult:
+    """Rewrite a Debian config toward Rocky.
+
+    The Rocky destination is stored on `debian_path` so format_remap_report
+    keeps printing a path and keys, and still does not print values.
+    """
+    if cmap.format in _COPY_FORMATS or cmap.format not in _LINE_FORMATS:
+        if cmap.format not in _COPY_FORMATS | _LINE_FORMATS:
+            raise Refused(f"unknown config format {cmap.format!r}")
+        return RemapResult(cmap.id, cmap.rocky, text, "", [], cmap.critical)
+    inverse = {value: key for key, value in cmap.keys.items()}
+    known = set(cmap.known)
+    out_lines: list[str] = []
+    aside: list[str] = []
+    unmapped: list[str] = []
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#") or stripped.startswith(";"):
+            out_lines.append(line)
+            continue
+        key, sep, rest = _split_key(line.strip())
+        if cmap.format == "sshd":
+            rest = rest.replace(SFTP_DEBIAN, SFTP_ROCKY)
+        renamed = inverse.get(key, key)
+        rendered = f"{renamed}{sep}{rest}" if sep else renamed
+        original = inverse.get(key, key)
+        if known and original not in known and key not in known and key not in inverse:
+            unmapped.append(key)
+            aside.append(rendered)
+        out_lines.append(rendered)
+    body = "\n".join(out_lines)
+    if text.endswith("\n") or body:
+        body += "\n"
+    aside_body = "\n".join(aside)
+    if aside_body:
+        aside_body += "\n"
+    return RemapResult(cmap.id, cmap.rocky, body, aside_body, unmapped, cmap.critical)
+
+
 def format_remap_report(result: RemapResult) -> str:
     """Key names and paths only. Configuration values stay out of the report."""
     lines = [f"map {result.map_id} -> {result.debian_path}"]

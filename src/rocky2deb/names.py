@@ -52,6 +52,44 @@ TRADEMARK = frozenset(
     }
 )
 
+# Debian names the Rocky installer already provides. This is not a blind invert
+# of BASE_DEB: rpm, dnf, and yum all map to apt, and the reverse of apt is dnf.
+BASE_FROM_DEB = {
+    "libc6": "glibc",
+    "systemd": "systemd",
+    "dbus": "dbus",
+    "apt": "dnf",
+    "dpkg": "rpm",
+    "base-files": "rocky-release",
+    "shim-signed": "shim-x64",
+    "firmware-linux-nonfree": "linux-firmware",
+    "ca-certificates": "ca-certificates",
+    "coreutils": "coreutils",
+    "bash": "bash",
+    "passwd": "shadow-utils",
+    "util-linux": "util-linux",
+    "ncurses-base": "ncurses-base",
+    "tzdata": "tzdata",
+}
+
+# Companions of a base package. The exact name lives in BASE_FROM_DEB.
+_DEB_BASE_PREFIX_RPM = (
+    ("libc6-", "glibc"),
+    ("linux-headers", "kernel"),
+    ("dpkg-", "rpm"),
+    ("apt-", "dnf"),
+    ("systemd-", "systemd"),
+)
+
+# Branding that must not be rebuilt into either distro. License text is not consulted.
+DEB_TRADEMARK = frozenset(
+    {
+        "debian-logos",
+        "ubuntu-mono",
+        "ubuntu-wallpapers",
+    }
+)
+
 _BLOCKED_ROOTS = frozenset({"glibc", "systemd", "rpm", "dnf", "yum"})
 
 _NAME_RE = re.compile(r"[a-z0-9][a-z0-9+.-]+")
@@ -83,6 +121,35 @@ def base_deb(name: str) -> str:
 
 def is_trademark(name: str) -> bool:
     return name in TRADEMARK
+
+
+def is_deb_trademark(name: str) -> bool:
+    return is_trademark(name) or name in DEB_TRADEMARK
+
+
+def is_deb_base(name: str) -> bool:
+    """True when Rocky already provides this Debian or Rocky package name."""
+    if name in BASE_FROM_DEB or is_base(name):
+        return True
+    return any(name.startswith(prefix) for prefix, _rpm in _DEB_BASE_PREFIX_RPM)
+
+
+def base_rpm(name: str) -> str:
+    """Rocky package that satisfies a Debian base name. Empty when it is not base."""
+    if name in BASE_FROM_DEB:
+        return BASE_FROM_DEB[name]
+    if name in BASE_DEB:
+        return name
+    for prefix, rpm in _DEB_BASE_PREFIX_RPM:
+        if name.startswith(prefix):
+            return rpm
+    if name.startswith("linux-image"):
+        return "kernel"
+    if name.startswith(("grub-efi", "grub-pc", "grub2", "grub")):
+        return "grub2-efi-x64"
+    if name.startswith("kernel"):
+        return name
+    return ""
 
 
 def is_blocked_root(name: str) -> bool:

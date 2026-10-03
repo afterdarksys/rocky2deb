@@ -1,13 +1,19 @@
 """Emit an RPM spec from Package IR for build systems with a known template.
 
 A Debian rules file that is only `dh`, or a custom script, is spec-unemittable.
-The planner must not select a binary repack unless the operator pins it.
+emit_repack_spec writes a noarch source install for those systems. It does
+not run debian/rules and it does not claim a template build ran.
 """
 
 from __future__ import annotations
 
-from rocky2deb.errors import SpecUnemittable
+import re
+
+from rocky2deb.errors import Refused, SpecUnemittable
 from rocky2deb.ir import PackageIR
+from rocky2deb.srpm_pack import refuse_spec_field
+
+_SOURCE_NAME = re.compile(r"^[A-Za-z0-9._+-]+$")
 
 _BUILD = {
     "cmake": ("%cmake\n%cmake_build", "%cmake_install"),
@@ -47,3 +53,68 @@ def emit_spec(package: PackageIR) -> str:
         lines.append("# warning: no files recorded")
     lines.append("")
     return "\n".join(lines)
+
+
+def emit_repack_spec(
+    *,
+    name: str,
+    version: str,
+    release: str,
+    license_text: str,
+    summary: str,
+    sources: list[str],
+    epoch: str = "",
+) -> str:
+    """Write a noarch spec that installs the upstream tree and builds nothing.
+
+    The ``cp`` line is spec text. This function does not run it.
+    """
+    if not sources:
+        raise Refused("repack needs a source tarball")
+    for value in (name, version, release, epoch):
+        if value:
+            refuse_spec_field(value, allow_space=False)
+    if not name or not version or not release:
+        raise Refused("refusing spec field")
+    refuse_spec_field(summary, allow_space=True)
+    refuse_spec_field(license_text, allow_space=True)
+    for source in sources:
+        if _SOURCE_NAME.fullmatch(source) is None:
+            raise Refused("refusing source file")
+    lines = [
+        f"Name: {name}",
+        f"Version: {version}",
+        f"Release: {release}",
+        f"Summary: {summary}",
+        f"License: {license_text}",
+        "BuildArch: noarch",
+    ]
+    if epoch not in ("", "0"):
+        lines.append(f"Epoch: {epoch}")
+    for index, source in enumerate(sources):
+        lines.append(f"Source{index}: {source}")
+    lines.extend(
+        [
+            "",
+            "%description",
+            "The upstream build system has no spec template. debian/rules is not run.",
+            "",
+            "%prep",
+            "%autosetup",
+            "",
+            "%build",
+            "",
+            "%install",
+            "mkdir -p %{buildroot}/usr/src/repack/%{name}",
+            "cp -a . %{buildroot}/usr/src/repack/%{name}",
+            "",
+            "%files",
+            "/usr/src/repack/%{name}",
+            "",
+        ]
+    )
+    text = "\n".join(lines)
+    for banned in ("%configure", "%cmake", "%meson", "%py3_build"):
+        if banned in text:
+            raise Refused("refusing spec field")
+    return text

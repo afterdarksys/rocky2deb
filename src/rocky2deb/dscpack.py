@@ -75,6 +75,11 @@ def _changelog_version(tree: Path) -> tuple[str, str]:
     return name, version
 
 
+def tar_debian_bytes(tree: Path) -> bytes:
+    """Pack debian/ with the same rules as the .dsc writer. Does not run rules."""
+    return _tar_debian(tree)
+
+
 def _tar_debian(tree: Path) -> bytes:
     debian = tree / "debian"
     if not debian.is_dir():

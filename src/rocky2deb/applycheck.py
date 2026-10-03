@@ -28,3 +28,20 @@ def assert_debian_suite(text: str, suite: str) -> None:
         raise Refused(f"refusing apply: host ID is {host_id or 'missing'}, want debian")
     if codename != suite:
         raise Refused(f"refusing apply: host suite is {codename or 'missing'}, want {suite}")
+
+
+def assert_rocky_release(text: str, major: int) -> None:
+    """Accept Rocky 8, 9, or 10. The major is the VERSION_ID component before the dot.
+
+    "9" does not match "90" or "19". Debian and Ubuntu are refused.
+    """
+    if major not in (8, 9, 10):
+        raise Refused("rocky major must be 8, 9, or 10")
+    info = parse_os_release(text)
+    host_id = info.get("ID", "")
+    if host_id != "rocky":
+        raise Refused(f"refusing apply: host ID is {host_id or 'missing'}, want rocky")
+    version_id = info.get("VERSION_ID", "")
+    head = version_id.split(".", 1)[0] if version_id else ""
+    if head != str(major):
+        raise Refused(f"refusing apply: host version is {version_id or 'missing'}, want {major}")

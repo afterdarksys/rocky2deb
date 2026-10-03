@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from rocky2deb.applycheck import assert_debian_suite
+from rocky2deb.applycheck import assert_debian_suite, assert_rocky_release
 from rocky2deb.errors import Refused
 
 
@@ -38,16 +38,8 @@ def _member(root: Path, rel: str) -> Path:
     return target
 
 
-def apply_bundle(
-    root: Path,
-    suite: str,
-    bundle: Path,
-    os_release: str,
-    *,
-    allow_live: bool = False,
-) -> list[str]:
+def _copy_manifest(root: Path, bundle: Path, *, allow_live: bool) -> list[str]:
     """Copy manifest members into root. Return the relative paths written."""
-    assert_debian_suite(os_release, suite)
     dest_root = assert_root(root, allow_live=allow_live)
     source = Path(bundle)
     manifest = source / "manifest"
@@ -70,3 +62,29 @@ def apply_bundle(
         partial.replace(target)
         written.append(rel)
     return written
+
+
+def apply_bundle(
+    root: Path,
+    suite: str,
+    bundle: Path,
+    os_release: str,
+    *,
+    allow_live: bool = False,
+) -> list[str]:
+    """Copy a bundle onto a Debian root. The copy does not run apt."""
+    assert_debian_suite(os_release, suite)
+    return _copy_manifest(root, bundle, allow_live=allow_live)
+
+
+def apply_rocky_bundle(
+    root: Path,
+    major: int,
+    bundle: Path,
+    os_release: str,
+    *,
+    allow_live: bool = False,
+) -> list[str]:
+    """Copy a bundle onto a fresh Rocky 8, 9, or 10 root. The copy does not run dnf."""
+    assert_rocky_release(os_release, major)
+    return _copy_manifest(root, bundle, allow_live=allow_live)

@@ -52,6 +52,9 @@ def sniff_build_system(rules: str, build_depends: str) -> str:
         return "meson"
     if "pybuild" in blob or "dh-python" in blob:
         return "python"
+    # An explicit autotools buildsystem has a spec template. Plain `dh` does not.
+    if "buildsystem=autotools" in blob or "buildsystem=autoconf" in blob:
+        return "autotools"
     if re.search(r"\bdh\b", rules):
         return "dh"
     return "custom"
