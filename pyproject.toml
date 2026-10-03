@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "rocky2deb"
 version = "0.1.0"
 description = "Plan Rocky and Debian migrations, convert source packages both ways, pack an unsigned source RPM, publish dnf metadata, bring one RPM onto Debian with rockify, and export Ubuntu or Debian archive source."
-readme = "docs/plans/2026-10-03-rocky2deb-design.md"
+readme = "README.md"
 requires-python = ">=3.11"
 
 [project.scripts]
